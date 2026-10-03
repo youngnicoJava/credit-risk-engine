@@ -13,10 +13,10 @@
 | OTEL_SERVICE_NAME           | credit-risk-engine                           | credit-risk-engine                  |
 | FRONTEND_ORIGIN             | http://localhost:5173                        | required allowed SPA origin         |
 | VITE_API_URL                | http://localhost:8082                        | deployed API base URL               |
-| VITE_OIDC_URL               | http://localhost:8180                        | OIDC provider base URL              |
+| VITE_OIDC_URL               | http://localhost:8181                        | OIDC provider base URL              |
 | VITE_OIDC_REALM             | credit-risk                                  | registered production realm         |
 | VITE_OIDC_CLIENT_ID         | credit-risk-analyst                          | registered public SPA client        |
 
-Never place production secrets in tracked files. Production Hibernate validates the Flyway-owned schema. Structured JSON logging is enabled in `%prod`; health, Micrometer Prometheus, OpenTelemetry and Kafka connector health are configured. Kafka readiness becomes relevant when messaging channels are enabled.
+Never place production secrets in tracked files. Production Hibernate validates the Flyway-owned schema. Structured JSON logging is enabled in `%prod`; health, Micrometer Prometheus, OpenTelemetry and Kafka connector health are configured. Kafka readiness becomes relevant when messaging channels are enabled. In `%dev`, Quarkus observability Dev Services are disabled so ordinary UI testing does not start the Grafana OTel LGTM container. OpenTelemetry remains enabled; the OTLP exporter defaults off locally. `%test` keeps its existing behavior and `%prod` observability settings are unchanged.
 
 The dev Keycloak realm is imported only in `%dev` and includes `analyst` / `analyst` with `RISK_ANALYST` and `admin` / `admin` with `ADMIN`. They must never be used for production. REST `/api/*` requires an authenticated token in dev and prod; health/OpenAPI paths retain framework routing. Dev and prod CORS are explicit single origins, not wildcards.

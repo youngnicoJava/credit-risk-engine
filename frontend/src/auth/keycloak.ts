@@ -1,7 +1,7 @@
 import Keycloak from 'keycloak-js'
 
 export const keycloak = new Keycloak({
-  url: import.meta.env.VITE_OIDC_URL ?? 'http://localhost:8180',
+  url: import.meta.env.VITE_OIDC_URL ?? 'http://localhost:8181',
   realm: import.meta.env.VITE_OIDC_REALM ?? 'credit-risk',
   clientId: import.meta.env.VITE_OIDC_CLIENT_ID ?? 'credit-risk-analyst',
 })
