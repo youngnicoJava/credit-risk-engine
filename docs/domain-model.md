@@ -10,3 +10,5 @@
 - `CreditPolicy` is implemented by `PersonalLoanRiskPolicy` (`personal-loan-ar` / `2.0.0`).
 
 See [risk-policy.md](risk-policy.md) for the formulas and exact decision thresholds. This is an explainable portfolio/demo policy, not a real proprietary bank underwriting model or credit-bureau score.
+
+Assessment history is browsed through a 0-based page index (page size 1-100) in evaluated-time/id descending order. Optional decision, risk-band, application, request and policy-version filters are applied by the adapter; page results contain an explicit summary and do not reconstruct missing historical financial explanations.

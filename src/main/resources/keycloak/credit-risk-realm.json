@@ -1,0 +1,56 @@
+{
+  "realm": "credit-risk",
+  "enabled": true,
+  "displayName": "Credit Risk Engine",
+  "roles": {
+    "realm": [
+      { "name": "RISK_ANALYST", "description": "Read and assess credit risk applications" },
+      { "name": "ADMIN", "description": "Administrative access to the risk console" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "credit-risk-analyst",
+      "name": "Credit Risk Analyst Console",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "http://localhost:5173",
+      "baseUrl": "http://localhost:5173",
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      },
+      "defaultClientScopes": ["web-origins", "acr", "roles", "profile", "basic", "email"]
+    }
+  ],
+  "users": [
+    {
+      "username": "analyst",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Risk",
+      "lastName": "Analyst",
+      "email": "analyst@risk.local",
+      "credentials": [{ "type": "password", "value": "analyst", "temporary": false }],
+      "realmRoles": ["RISK_ANALYST"]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Risk",
+      "lastName": "Admin",
+      "email": "admin@risk.local",
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "realmRoles": ["ADMIN"]
+    }
+  ]
+}

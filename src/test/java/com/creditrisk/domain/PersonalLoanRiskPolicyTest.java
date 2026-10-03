@@ -1,22 +1,239 @@
 package com.creditrisk.domain;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.creditrisk.domain.model.*;
 import com.creditrisk.domain.policy.*;
 import com.creditrisk.domain.valueobject.Money;
-import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.UUID;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class PersonalLoanRiskPolicyTest {
- private final PersonalLoanRiskPolicy policy=new PersonalLoanRiskPolicy();
- private AssessmentInput input(String amount,String income,String debt,int term,EmploymentStatus employment,int tenure,String product,String currency){Currency c=Currency.getInstance(currency);return new AssessmentInput(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),new Money(new BigDecimal(amount),c),term,product,new ApplicantFinancialProfile(new Money(new BigDecimal(income),c),new Money(new BigDecimal(debt),c),employment,tenure),"policy-test");}
- @Test void strongAffordableStableProfileIsApprovedWithExplainability(){var result=policy.evaluate(input("1000000","1500000","0",24,EmploymentStatus.PERMANENT,60,"PERSONAL_LOAN","ARS"));assertEquals(com.creditrisk.domain.decision.Decision.APPROVE,result.decision());assertEquals(RiskBand.A,result.riskBand());assertEquals("2.0.0",policy.version().value());assertTrue(result.reasons().stream().anyMatch(r->r.value().equals("ELIGIBLE_BY_POLICY")));assertTrue(result.scoring().components().stream().anyMatch(c->c.points()>0));}
- @Test void moderateProfileIsReferredAndWeakProfileRejected(){var refer=policy.evaluate(input("2500000","1000000","100000",36,EmploymentStatus.TEMPORARY,2,"PERSONAL_LOAN","ARS"));assertEquals(com.creditrisk.domain.decision.Decision.REFER,refer.decision());assertTrue(refer.reasons().stream().anyMatch(r->r.value().equals("MANUAL_REVIEW_REQUIRED")));var reject=policy.evaluate(input("5000000","300000","200000",60,EmploymentStatus.UNEMPLOYED,0,"PERSONAL_LOAN","ARS"));assertEquals(com.creditrisk.domain.decision.Decision.REJECT,reject.decision());}
- @Test void hardEligibilityFailuresOverrideScore(){var unsupported=policy.evaluate(input("1000000","5000000","0",24,EmploymentStatus.PERMANENT,120,"MORTGAGE","USD"));assertEquals(com.creditrisk.domain.decision.Decision.REJECT,unsupported.decision());assertFalse(unsupported.eligibility().eligible());assertTrue(unsupported.eligibility().reasons().stream().anyMatch(r->r.value().equals("UNSUPPORTED_CURRENCY")));assertTrue(unsupported.eligibility().reasons().stream().anyMatch(r->r.value().equals("UNSUPPORTED_PRODUCT")));}
- @Test void amountAndTermPolicyBoundariesAreInclusive(){assertTrue(policy.evaluate(input("100000","1000000","0",6,EmploymentStatus.PERMANENT,24,"PERSONAL_LOAN","ARS")).eligibility().eligible());assertTrue(policy.evaluate(input("10000000","1000000","0",60,EmploymentStatus.PERMANENT,24,"PERSONAL_LOAN","ARS")).eligibility().eligible());assertFalse(policy.evaluate(input("10000000.01","1000000","0",60,EmploymentStatus.PERMANENT,24,"PERSONAL_LOAN","ARS")).eligibility().eligible());assertFalse(policy.evaluate(input("100000","1000000","0",61,EmploymentStatus.PERMANENT,24,"PERSONAL_LOAN","ARS")).eligibility().eligible());}
- @Test void zeroIncomeIsRejectedAsInvalidFinancialInputAndNegativeDebtIsInvalid(){Currency ars=Currency.getInstance("ARS");assertThrows(IllegalArgumentException.class,()->new ApplicantFinancialProfile(new Money(BigDecimal.ZERO,ars),new Money(BigDecimal.ZERO,ars),EmploymentStatus.UNEMPLOYED,0));assertThrows(IllegalArgumentException.class,()->new ApplicantFinancialProfile(new Money(new BigDecimal("1000"),ars),new Money(new BigDecimal("-1"),ars),EmploymentStatus.PERMANENT,1));}
- @Test void affordabilityUsesBigDecimalRatiosAndPreservesNegativeDisposableBalance(){var result=new AffordabilityCalculator().assess(input("1000000","1000000","0",24,EmploymentStatus.PERMANENT,48,"PERSONAL_LOAN","ARS"));assertEquals(new BigDecimal("0.0000"),result.currentDebtToIncomeRatio());assertTrue(result.projectedDebtToIncomeRatio().compareTo(BigDecimal.ZERO)>0);assertEquals(4,result.projectedDebtToIncomeRatio().scale());assertTrue(result.disposableIncome().signum()>0);var deficit=new AffordabilityCalculator().assess(input("10000000","100000","0",60,EmploymentStatus.PERMANENT,48,"PERSONAL_LOAN","ARS"));assertTrue(deficit.disposableIncome().signum()<0);}
- @Test void scoreAndRiskBandBoundariesAreStable(){assertEquals(RiskBand.A,PersonalLoanRiskPolicy.band(780));assertEquals(RiskBand.B,PersonalLoanRiskPolicy.band(700));assertEquals(RiskBand.C,PersonalLoanRiskPolicy.band(620));assertEquals(RiskBand.D,PersonalLoanRiskPolicy.band(540));assertEquals(RiskBand.E,PersonalLoanRiskPolicy.band(539));var input=input("1000000","1500000","0",24,EmploymentStatus.PERMANENT,60,"PERSONAL_LOAN","ARS");assertEquals(policy.evaluate(input).scoring(),policy.evaluate(input).scoring());var scorer=new CreditScorer();var calculator=new AffordabilityCalculator();assertEquals(850,scorer.score(input,calculator.assess(input)).score().value());var weak=input("10000000","100000","0",60,EmploymentStatus.UNEMPLOYED,0,"PERSONAL_LOAN","ARS");assertEquals(300,scorer.score(weak,calculator.assess(weak)).score().value());}
+  private final PersonalLoanRiskPolicy policy = new PersonalLoanRiskPolicy();
+
+  private AssessmentInput input(
+      String amount,
+      String income,
+      String debt,
+      int term,
+      EmploymentStatus employment,
+      int tenure,
+      String product,
+      String currency) {
+    Currency c = Currency.getInstance(currency);
+    return new AssessmentInput(
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        new Money(new BigDecimal(amount), c),
+        term,
+        product,
+        new ApplicantFinancialProfile(
+            new Money(new BigDecimal(income), c),
+            new Money(new BigDecimal(debt), c),
+            employment,
+            tenure),
+        "policy-test");
+  }
+
+  @Test
+  void strongAffordableStableProfileIsApprovedWithExplainability() {
+    var result =
+        policy.evaluate(
+            input(
+                "1000000",
+                "1500000",
+                "0",
+                24,
+                EmploymentStatus.PERMANENT,
+                60,
+                "PERSONAL_LOAN",
+                "ARS"));
+    assertEquals(com.creditrisk.domain.decision.Decision.APPROVE, result.decision());
+    assertEquals(RiskBand.A, result.riskBand());
+    assertEquals("2.0.0", policy.version().value());
+    assertTrue(result.reasons().stream().anyMatch(r -> r.value().equals("ELIGIBLE_BY_POLICY")));
+    assertTrue(result.scoring().components().stream().anyMatch(c -> c.points() > 0));
+  }
+
+  @Test
+  void moderateProfileIsReferredAndWeakProfileRejected() {
+    var refer =
+        policy.evaluate(
+            input(
+                "2500000",
+                "1000000",
+                "100000",
+                36,
+                EmploymentStatus.TEMPORARY,
+                2,
+                "PERSONAL_LOAN",
+                "ARS"));
+    assertEquals(com.creditrisk.domain.decision.Decision.REFER, refer.decision());
+    assertTrue(refer.reasons().stream().anyMatch(r -> r.value().equals("MANUAL_REVIEW_REQUIRED")));
+    var reject =
+        policy.evaluate(
+            input(
+                "5000000",
+                "300000",
+                "200000",
+                60,
+                EmploymentStatus.UNEMPLOYED,
+                0,
+                "PERSONAL_LOAN",
+                "ARS"));
+    assertEquals(com.creditrisk.domain.decision.Decision.REJECT, reject.decision());
+  }
+
+  @Test
+  void hardEligibilityFailuresOverrideScore() {
+    var unsupported =
+        policy.evaluate(
+            input(
+                "1000000", "5000000", "0", 24, EmploymentStatus.PERMANENT, 120, "MORTGAGE", "USD"));
+    assertEquals(com.creditrisk.domain.decision.Decision.REJECT, unsupported.decision());
+    assertFalse(unsupported.eligibility().eligible());
+    assertTrue(
+        unsupported.eligibility().reasons().stream()
+            .anyMatch(r -> r.value().equals("UNSUPPORTED_CURRENCY")));
+    assertTrue(
+        unsupported.eligibility().reasons().stream()
+            .anyMatch(r -> r.value().equals("UNSUPPORTED_PRODUCT")));
+  }
+
+  @Test
+  void amountAndTermPolicyBoundariesAreInclusive() {
+    assertTrue(
+        policy
+            .evaluate(
+                input(
+                    "100000",
+                    "1000000",
+                    "0",
+                    6,
+                    EmploymentStatus.PERMANENT,
+                    24,
+                    "PERSONAL_LOAN",
+                    "ARS"))
+            .eligibility()
+            .eligible());
+    assertTrue(
+        policy
+            .evaluate(
+                input(
+                    "10000000",
+                    "1000000",
+                    "0",
+                    60,
+                    EmploymentStatus.PERMANENT,
+                    24,
+                    "PERSONAL_LOAN",
+                    "ARS"))
+            .eligibility()
+            .eligible());
+    assertFalse(
+        policy
+            .evaluate(
+                input(
+                    "10000000.01",
+                    "1000000",
+                    "0",
+                    60,
+                    EmploymentStatus.PERMANENT,
+                    24,
+                    "PERSONAL_LOAN",
+                    "ARS"))
+            .eligibility()
+            .eligible());
+    assertFalse(
+        policy
+            .evaluate(
+                input(
+                    "100000",
+                    "1000000",
+                    "0",
+                    61,
+                    EmploymentStatus.PERMANENT,
+                    24,
+                    "PERSONAL_LOAN",
+                    "ARS"))
+            .eligibility()
+            .eligible());
+  }
+
+  @Test
+  void zeroIncomeIsRejectedAsInvalidFinancialInputAndNegativeDebtIsInvalid() {
+    Currency ars = Currency.getInstance("ARS");
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new ApplicantFinancialProfile(
+                new Money(BigDecimal.ZERO, ars),
+                new Money(BigDecimal.ZERO, ars),
+                EmploymentStatus.UNEMPLOYED,
+                0));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new ApplicantFinancialProfile(
+                new Money(new BigDecimal("1000"), ars),
+                new Money(new BigDecimal("-1"), ars),
+                EmploymentStatus.PERMANENT,
+                1));
+  }
+
+  @Test
+  void affordabilityUsesBigDecimalRatiosAndPreservesNegativeDisposableBalance() {
+    var result =
+        new AffordabilityCalculator()
+            .assess(
+                input(
+                    "1000000",
+                    "1000000",
+                    "0",
+                    24,
+                    EmploymentStatus.PERMANENT,
+                    48,
+                    "PERSONAL_LOAN",
+                    "ARS"));
+    assertEquals(new BigDecimal("0.0000"), result.currentDebtToIncomeRatio());
+    assertTrue(result.projectedDebtToIncomeRatio().compareTo(BigDecimal.ZERO) > 0);
+    assertEquals(4, result.projectedDebtToIncomeRatio().scale());
+    assertTrue(result.disposableIncome().signum() > 0);
+    var deficit =
+        new AffordabilityCalculator()
+            .assess(
+                input(
+                    "10000000",
+                    "100000",
+                    "0",
+                    60,
+                    EmploymentStatus.PERMANENT,
+                    48,
+                    "PERSONAL_LOAN",
+                    "ARS"));
+    assertTrue(deficit.disposableIncome().signum() < 0);
+  }
+
+  @Test
+  void scoreAndRiskBandBoundariesAreStable() {
+    assertEquals(RiskBand.A, PersonalLoanRiskPolicy.band(780));
+    assertEquals(RiskBand.B, PersonalLoanRiskPolicy.band(700));
+    assertEquals(RiskBand.C, PersonalLoanRiskPolicy.band(620));
+    assertEquals(RiskBand.D, PersonalLoanRiskPolicy.band(540));
+    assertEquals(RiskBand.E, PersonalLoanRiskPolicy.band(539));
+    var input =
+        input(
+            "1000000", "1500000", "0", 24, EmploymentStatus.PERMANENT, 60, "PERSONAL_LOAN", "ARS");
+    assertEquals(policy.evaluate(input).scoring(), policy.evaluate(input).scoring());
+    var scorer = new CreditScorer();
+    var calculator = new AffordabilityCalculator();
+    assertEquals(850, scorer.score(input, calculator.assess(input)).score().value());
+    var weak =
+        input(
+            "10000000", "100000", "0", 60, EmploymentStatus.UNEMPLOYED, 0, "PERSONAL_LOAN", "ARS");
+    assertEquals(300, scorer.score(weak, calculator.assess(weak)).score().value());
+  }
 }

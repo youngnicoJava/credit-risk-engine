@@ -1,0 +1,45 @@
+.badge,
+.band {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.approve {
+  color: var(--success);
+  background: #17372f;
+  border-color: #285541;
+}
+.refer {
+  color: var(--warning);
+  background: #382f20;
+  border-color: #59492e;
+}
+.reject {
+  color: var(--danger);
+  background: #3b262b;
+  border-color: #5f353b;
+}
+.bandA,
+.bandB {
+  color: #9bc7ff;
+  background: #1b3046;
+  border-color: #304c6a;
+}
+.bandC {
+  color: var(--warning);
+  background: #382f20;
+  border-color: #59492e;
+}
+.bandD,
+.bandE,
+.bandUNKNOWN {
+  color: #e0a1a5;
+  background: #3b262b;
+  border-color: #5f353b;
+}

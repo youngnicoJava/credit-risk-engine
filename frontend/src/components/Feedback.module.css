@@ -1,0 +1,84 @@
+.state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 240px;
+  color: var(--text-secondary);
+}
+.spinner {
+  width: 17px;
+  height: 17px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.stateCard {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: 260px;
+  padding: 30px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-align: center;
+}
+.stateCard h2 {
+  margin: 10px 0 4px;
+  color: var(--text);
+  font-size: 1rem;
+}
+.stateCard p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.emptyMark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 1.4rem;
+}
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  border: 1px solid #60383c;
+  border-radius: var(--radius-md);
+  background: #2a2027;
+}
+.error strong {
+  color: #f0c0c2;
+}
+.error p {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+}
+.error code {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--danger);
+}
+.correlation {
+  font-size: 0.8rem;
+  font-family: ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 580px) {
+  .error {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,47 @@
+.score {
+  min-width: 200px;
+}
+.value {
+  margin-bottom: 13px;
+  color: var(--text);
+  font-size: 2rem;
+  font-weight: 670;
+  letter-spacing: -0.05em;
+}
+.value span {
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  font-weight: 450;
+  letter-spacing: 0;
+}
+.track {
+  position: relative;
+  height: 7px;
+  overflow: visible;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #793d46 0%, #8c7141 42%, #315e87 78%, #34785f 100%);
+}
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: rgb(226 237 250 / 16%);
+}
+.marker {
+  position: absolute;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 1px rgb(235 243 255 / 35%);
+}
+.scale {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}

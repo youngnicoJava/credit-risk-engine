@@ -33,14 +33,14 @@ A projected DTI above 60%, or disposable income at or below zero, is an automati
 
 New policy scores are clamped to 300-850 (historic baseline rows can still contain 0-1000 scores). Starting score is 700. Components are summed, with each component persisted as a stable code, point adjustment and plain-language explanation:
 
-| Factor | Rule | Points |
-|---|---|---:|
-| Existing DTI | <=10%; <=25%; otherwise | +50; +20; -70 |
-| Projected DTI | <=25%; <=35%; <=50%; otherwise | +80; +35; -70; -160 |
-| Disposable income | >=3 reference installments; >=1; otherwise | +45; 0; -130 |
-| Employment | permanent >=24m; permanent 6-23m; permanent <6m; self-employed >=36m; otherwise self-employed; temporary; unemployed | +45; +15; -60; +15; -35; -45; -120 |
-| Principal / monthly income | <=2; >5; otherwise | +25; -65; 0 |
-| Term | >48 months | -25 |
+| Factor                     | Rule                                                                                                                 |                             Points |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------: |
+| Existing DTI               | <=10%; <=25%; otherwise                                                                                              |                      +50; +20; -70 |
+| Projected DTI              | <=25%; <=35%; <=50%; otherwise                                                                                       |                +80; +35; -70; -160 |
+| Disposable income          | >=3 reference installments; >=1; otherwise                                                                           |                       +45; 0; -130 |
+| Employment                 | permanent >=24m; permanent 6-23m; permanent <6m; self-employed >=36m; otherwise self-employed; temporary; unemployed | +45; +15; -60; +15; -35; -45; -120 |
+| Principal / monthly income | <=2; >5; otherwise                                                                                                   |                        +25; -65; 0 |
+| Term                       | >48 months                                                                                                           |                                -25 |
 
 Bands: A 780-850, B 700-779, C 620-699, D 540-619, E 300-539.
 
