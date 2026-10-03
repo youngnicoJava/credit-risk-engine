@@ -6,8 +6,15 @@ export const keycloak = new Keycloak({
   clientId: import.meta.env.VITE_OIDC_CLIENT_ID ?? 'credit-risk-analyst',
 })
 
+let initialization: Promise<boolean> | undefined
+
 export async function initializeAuth(): Promise<boolean> {
-  return keycloak.init({ onLoad: 'check-sso', pkceMethod: 'S256', checkLoginIframe: false })
+  initialization ??= keycloak.init({
+    onLoad: 'check-sso',
+    pkceMethod: 'S256',
+    checkLoginIframe: false,
+  })
+  return initialization
 }
 
 export function userRoles(): string[] {
