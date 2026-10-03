@@ -1,23 +1,27 @@
-# Kafka contracts v1
+# Kafka contracts
 
 All messages are UTF-8 JSON versioned envelopes:
 
 ```json
-{"eventId":"uuid","eventType":"loan.risk-assessment.requested.v1","eventVersion":1,"occurredAt":"2026-01-01T00:00:00Z","aggregateType":"LoanApplication","aggregateId":"uuid","correlationId":"corr-id","payload":{}}
+{"eventId":"uuid","eventType":"loan.risk-assessment.requested.v2","eventVersion":2,"occurredAt":"2026-01-01T00:00:00Z","aggregateType":"LoanApplication","aggregateId":"uuid","correlationId":"corr-id","payload":{}}
 ```
 
-Request topic `loan.risk-assessment.requested.v1`, key = loan application UUID. Payload schema:
+## Current v2 request
+
+Topic `loan.risk-assessment.requested.v2`; key = loan application UUID.
 
 ```json
-{"assessmentRequestId":"uuid","loanApplicationId":"uuid","customerReference":"uuid","requestedAmount":"1250000.00","currency":"ARS","termMonths":24,"productType":"PERSONAL_LOAN"}
+{"assessmentRequestId":"uuid","loanApplicationId":"uuid","customerReference":"uuid","requestedAmount":"1250000.00","currency":"ARS","termMonths":24,"productType":"PERSONAL_LOAN","monthlyIncome":"1500000.00","existingMonthlyDebtObligations":"250000.00","employmentStatus":"PERMANENT","employmentTenureMonths":60}
 ```
 
-`assessmentRequestId` is the Loan Application ID and is the idempotency key. No customer name/email or OIDC subject crosses the service boundary.
+LO sends customer-declared financial inputs because the application collects them explicitly. It sends no name, email, OIDC subject, token or identity credentials. `assessmentRequestId` is the request idempotency key. Identical payloads replay the same stored outcome; materially different payload under the same ID is a conflict and a malformed/conflicting Kafka message is dead-lettered.
 
-Result topic `credit-risk.assessment.completed.v1`, key = loan application UUID. Payload schema:
+## Current v2 result
 
-```json
-{"assessmentRequestId":"uuid","loanApplicationId":"uuid","riskAssessmentId":"uuid","decision":"APPROVE","score":750,"policyVersion":"baseline-1.0.0","reasonCodes":["ELIGIBLE_BY_BASELINE_POLICY"],"evaluatedAt":"2026-01-01T00:00:00Z","correlationId":"corr-id"}
-```
+Topic `credit-risk.assessment.completed.v2`; key = loan application UUID. Payload contains request/application/assessment IDs, decision, score, policy ID/version, risk band, reason objects (`code`, `description`), timestamp, correlation ID and explanation with eligibility, applicant inputs, affordability values and score components. CRE's result plus its outbox record are committed atomically.
 
-The request/result payloads are integration contracts, not internal aggregate or JPA serialization. Consumers reject malformed messages into topic-specific `.DLQ` topics. Unknown event versions are rejected and routed to the matching dead-letter topic, where operators can inspect or replay them after deploying a compatible consumer.
+## Historical v1
+
+`loan.risk-assessment.requested.v1` and `credit-risk.assessment.completed.v1` retain their original schemas. V2 is intentionally a new contract because financial profile inputs and the explainable result change both payload and decision semantics. Deploy CRE v2 consumer and LO v2 producer/consumer together; v1 traffic is not silently interpreted as a v2 assessment. Both channels route malformed/unknown versions to their v2 DLQs.
+
+The envelope and payload are integration contracts, not serialized domain/JPA objects. Correlation ID flows from LO request through CRE assessment and result.

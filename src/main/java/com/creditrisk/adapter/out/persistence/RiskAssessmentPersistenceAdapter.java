@@ -5,4 +5,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.Optional;
 import java.util.UUID;
-@ApplicationScoped public class RiskAssessmentPersistenceAdapter implements RiskAssessmentRepository {private final RiskAssessmentPanacheRepository repo;@Inject public RiskAssessmentPersistenceAdapter(RiskAssessmentPanacheRepository r){repo=r;}public Optional<RiskAssessment> findById(UUID id){return repo.findByIdOptional(id).map(RiskAssessmentEntity::toDomain);}public Optional<RiskAssessment> findByRequestId(UUID id){return repo.findRequest(id).map(RiskAssessmentEntity::toDomain);}public void save(RiskAssessment a){repo.persist(RiskAssessmentEntity.fromDomain(a));}}
+@ApplicationScoped public class RiskAssessmentPersistenceAdapter implements RiskAssessmentRepository {
+ private final RiskAssessmentPanacheRepository repo; private final com.fasterxml.jackson.databind.ObjectMapper mapper;
+ @Inject public RiskAssessmentPersistenceAdapter(RiskAssessmentPanacheRepository r,com.fasterxml.jackson.databind.ObjectMapper m){repo=r;mapper=m;}
+ public Optional<RiskAssessment> findById(UUID id){return repo.findByIdOptional(id).map(e->e.toDomain(mapper));}
+ public Optional<RiskAssessment> findByRequestId(UUID id){return repo.findRequest(id).map(e->e.toDomain(mapper));}
+ public void save(RiskAssessment a){repo.persist(RiskAssessmentEntity.fromDomain(a,mapper));}
+}

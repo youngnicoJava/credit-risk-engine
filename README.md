@@ -2,7 +2,7 @@
 
 Standalone credit decisioning service using Java 25, Quarkus 3.39.5, Maven and PostgreSQL. The core uses Clean Architecture: domain policy/value objects are framework-free; application use cases depend on ports; REST, Kafka and persistence adapters implement those ports.
 
-The first deterministic `baseline-1.0.0` policy is a technical demonstration, not a lending recommendation: it supports PERSONAL_LOAN in ARS up to 60 months; amounts up to ARS 2,000,000 are APPROVE, amounts above that through ARS 5,000,000 are REFER, and amounts above ARS 5,000,000 or terms above 60 months are REJECT. Unsupported product/currency is REFER. Scores/reason codes explain this policy; no income, bureau or ML data is currently collected.
+The deterministic `personal-loan-ar` policy version `2.0.0` evaluates applicant-declared income, existing debt, employment, eligibility, affordability and an explainable internal score. It returns APPROVE, REFER or REJECT with persisted policy evidence; exact thresholds and the 48% risk-reference installment are documented in [docs/risk-policy.md](docs/risk-policy.md). This is a portfolio/demo policy, not a proprietary bank policy, bureau/FICO score or verified-income claim.
 
 ## Run locally
 
