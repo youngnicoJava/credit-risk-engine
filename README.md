@@ -27,9 +27,9 @@ $env:DB_JDBC_URL='jdbc:postgresql://localhost:5434/credit_risk'
 ```
 
 REST is at `http://localhost:8082/api/v1`. `GET /api/v1/risk-assessments` accepts `page` (0-based), `size` (max 100), `decision`, `riskBand`, `loanApplicationId`, `assessmentRequestId`, and `policyVersion`. List and detail require `RISK_ANALYST` or `ADMIN`. OpenAPI is `/q/openapi`, Swagger UI `/q/swagger-ui`, health `/q/health/live` and `/q/health/ready`, Prometheus metrics `/q/metrics`.
-
+---
 To enable Kafka integration, set `KAFKA_BOOTSTRAP_SERVERS=localhost:29092` and `RISK_KAFKA_ENABLED=true`; Loan Origination must also use `RISK_ASSESSMENT_MODE=KAFKA`. PostgreSQL and Kafka are private services in the compose network and exposed only on local host ports for development.
-
+---
 ## Validation and formatting
 
 ```powershell
@@ -45,6 +45,12 @@ bun run format:check
 
 Java uses Google Java Format through Spotless; the frontend and Markdown use Prettier. GitHub Actions runs Maven verification/format checks and the strict TypeScript/Vite production build.
 
+---
+
 ## Architecture and contracts
 
 See [architecture](docs/architecture.md), [domain model](docs/domain-model.md), [risk policy](docs/risk-policy.md), [Kafka contracts](docs/kafka-contracts.md), [local development and LO integration](docs/local-development.md), and [configuration](docs/configuration.md). Flyway owns PostgreSQL schema changes; Hibernate validates the schema. Production secrets are environment-supplied. Demo screenshots and a short walkthrough can be added under [docs/assets](docs/assets/README.md).
+
+---
+
+source available - noncommercial - Axel Fecha 
