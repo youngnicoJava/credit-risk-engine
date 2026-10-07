@@ -7,6 +7,7 @@ import { DecisionBadge, RiskBandBadge } from '../../components/StatusBadge'
 import { EmptyState, ErrorPanel, LoadingState } from '../../components/Feedback'
 import { ScoreDisplay } from '../../components/ScoreDisplay'
 import styles from './AssessmentDetailPage.module.css'
+import { employmentLabel, riskCodeLabel, riskExplanation } from '../../i18n'
 
 export function AssessmentDetailPage() {
   const { id = '' } = useParams()
@@ -46,12 +47,12 @@ export function AssessmentDetailPage() {
     window.setTimeout(() => setCopied(false), 1600)
   }
 
-  if (loading) return <LoadingState label="Loading assessment detail…" />
+  if (loading) return <LoadingState label="Cargando el detalle de la evaluación…" />
   if (error) return <ErrorPanel error={error} onRetry={() => setAttempt((value) => value + 1)} />
   if (!assessment)
     return (
-      <EmptyState title="Assessment unavailable">
-        The requested assessment could not be found.
+      <EmptyState title="Evaluación no disponible">
+        No se encontró la evaluación solicitada.
       </EmptyState>
     )
 
@@ -59,14 +60,14 @@ export function AssessmentDetailPage() {
   return (
     <div className={styles.page}>
       <Link to="/assessments" className={styles.back}>
-        ← Assessment history
+        ← Historial de evaluaciones
       </Link>
       <header className={styles.heading}>
         <div>
-          <div className={styles.eyebrow}>ASSESSMENT DETAIL</div>
-          <h1>Credit decision</h1>
+          <div className={styles.eyebrow}>DETALLE DE LA EVALUACIÓN</div>
+          <h1>Decisión crediticia</h1>
           <p>
-            Loan application{' '}
+            Solicitud{' '}
             <code title={assessment.loanApplicationId}>{assessment.loanApplicationId}</code>
           </p>
         </div>
@@ -78,27 +79,27 @@ export function AssessmentDetailPage() {
 
       <section className={styles.topGrid}>
         <article className={styles.card}>
-          <div className={styles.cardLabel}>INTERNAL CREDIT SCORE</div>
+          <div className={styles.cardLabel}>PUNTAJE INTERNO DE CRÉDITO</div>
           <div className={styles.scoreRow}>
             <ScoreDisplay score={assessment.score} />
             <RiskBandBadge band={assessment.riskBand} />
           </div>
           <p className={styles.disclaimer}>
-            Demonstration score only. It is not a bureau or FICO score.
+            Puntaje de demostración. No corresponde a un bureau ni a FICO.
           </p>
         </article>
         <article className={styles.card + ' ' + styles.policyCard}>
-          <div className={styles.cardLabel}>DECISION POLICY</div>
+          <div className={styles.cardLabel}>POLÍTICA DE DECISIÓN</div>
           <div className={styles.policyName}>{assessment.policyId}</div>
           <div className={styles.policyVersion}>
-            Version <strong>{assessment.policyVersion}</strong>
+            Versión <strong>{assessment.policyVersion}</strong>
           </div>
           <div className={styles.policyLine}>
-            <span>Assessment ID</span>
+            <span>ID de evaluación</span>
             <code title={assessment.assessmentId}>{assessment.assessmentId}</code>
           </div>
           <div className={styles.policyLine}>
-            <span>Request ID</span>
+            <span>ID de solicitud</span>
             <code title={assessment.assessmentRequestId}>{assessment.assessmentRequestId}</code>
           </div>
         </article>
@@ -109,40 +110,40 @@ export function AssessmentDetailPage() {
           <section className={styles.section}>
             <div className={styles.sectionHeading}>
               <div>
-                <div className={styles.cardLabel}>ABILITY TO REPAY</div>
-                <h2>Affordability</h2>
+                <div className={styles.cardLabel}>CAPACIDAD DE PAGO</div>
+                <h2>Asequibilidad</h2>
               </div>
-              <span className={styles.stressLabel}>Risk stress estimate</span>
+              <span className={styles.stressLabel}>Estimación de estrés de riesgo</span>
             </div>
             <p className={styles.note}>
-              The installment below is the engine’s affordability stress estimate. Loan Origination
-              calculates the customer offer installment separately after approval.
+              La cuota siguiente es una estimación de estrés para evaluar la capacidad de pago.
+              Loan Origination calcula por separado la cuota de la oferta después de la aprobación.
             </p>
             <div className={styles.metricGrid}>
               <Metric
-                label="Declared monthly income"
+                label="Ingreso mensual declarado"
                 value={formatMoney(explanation.affordability.monthlyIncome)}
               />
               <Metric
-                label="Existing monthly debt"
+                label="Deuda mensual existente"
                 value={formatMoney(explanation.affordability.existingMonthlyDebt)}
               />
               <Metric
-                label="Stress installment"
+                label="Cuota de referencia"
                 value={formatMoney(explanation.affordability.proposedMonthlyInstallment)}
                 accent
               />
               <Metric
-                label="Disposable after debt and stress payment"
+                label="Ingreso disponible luego de deuda y cuota"
                 value={formatMoney(explanation.affordability.disposableIncome)}
                 danger={explanation.affordability.disposableIncome.amount <= 0}
               />
               <Metric
-                label="Current debt-to-income"
+                label="DTI actual"
                 value={formatRatio(explanation.affordability.currentDebtToIncomeRatio)}
               />
               <Metric
-                label="Projected debt-to-income"
+                label="DTI proyectado"
                 value={formatRatio(explanation.affordability.projectedDebtToIncomeRatio)}
                 warning={explanation.affordability.projectedDebtToIncomeRatio > 0.35}
               />
@@ -151,8 +152,8 @@ export function AssessmentDetailPage() {
 
           <section className={styles.twoColumns}>
             <article className={styles.section}>
-              <div className={styles.cardLabel}>SCORING EVIDENCE</div>
-              <h2>Score breakdown</h2>
+              <div className={styles.cardLabel}>FUNDAMENTOS DEL PUNTAJE</div>
+              <h2>Desglose del puntaje</h2>
               <div className={styles.factorList}>
                 {explanation.scoreComponents.map((component, index) => (
                   <div className={styles.factor} key={`${component.code}-${index}`}>
@@ -163,55 +164,55 @@ export function AssessmentDetailPage() {
                       {component.points}
                     </span>
                     <div>
-                      <strong>{humanize(component.code)}</strong>
+                      <strong>{riskCodeLabel(component.code)}</strong>
                       <code>{component.code}</code>
-                      <p>{component.explanation}</p>
+                      <p>{riskExplanation(component.explanation)}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </article>
             <article className={styles.section}>
-              <div className={styles.cardLabel}>POLICY OUTCOME</div>
-              <h2>Reason codes</h2>
+              <div className={styles.cardLabel}>RESULTADO DE LA POLÍTICA</div>
+              <h2>Motivos</h2>
               <div className={styles.reasonList}>
                 {assessment.reasons.map((reason, index) => (
                   <div className={styles.reason} key={`${reason.code}-${index}`}>
                     <code>{reason.code}</code>
-                    <p>{reason.description}</p>
+                    <p>{riskExplanation(reason.description)}</p>
                   </div>
                 ))}
               </div>
               <div className={styles.eligibility}>
                 <span className={explanation.eligible ? styles.eligible : styles.ineligible}>
-                  {explanation.eligible ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
+                  {explanation.eligible ? 'ELEGIBLE' : 'NO ELEGIBLE'}
                 </span>
                 <span>
                   {explanation.eligibilityReasons.length
-                    ? explanation.eligibilityReasons.map((reason) => reason.description).join(' ')
-                    : 'The application satisfies the configured hard eligibility rules.'}
+                    ? explanation.eligibilityReasons.map((reason) => riskExplanation(reason.description)).join(' ')
+                    : 'La solicitud cumple las reglas de elegibilidad configuradas.'}
                 </span>
               </div>
             </article>
           </section>
 
           <section className={styles.section}>
-            <div className={styles.cardLabel}>APPLICANT DECLARATION</div>
-            <h2>Profile used by this assessment</h2>
+            <div className={styles.cardLabel}>DATOS DECLARADOS</div>
+            <h2>Perfil utilizado en esta evaluación</h2>
             <div className={styles.profileGrid}>
               <Metric
-                label="Employment status"
-                value={humanize(explanation.applicant.employmentStatus)}
+                label="Situación laboral"
+                value={employmentLabel(explanation.applicant.employmentStatus)}
               />
               <Metric
-                label="Employment tenure"
-                value={`${explanation.applicant.employmentTenureMonths} months`}
+                label="Antigüedad laboral"
+                value={`${explanation.applicant.employmentTenureMonths} meses`}
               />
               <Metric
-                label="Requested principal"
+                label="Capital solicitado"
                 value={formatMoney(explanation.requestedAmount)}
               />
-              <Metric label="Requested term" value={`${explanation.termMonths} months`} />
+              <Metric label="Plazo solicitado" value={`${explanation.termMonths} meses`} />
             </div>
           </section>
         </>
@@ -219,7 +220,7 @@ export function AssessmentDetailPage() {
         <section className={styles.legacy}>
           <span className={styles.legacyMark}>i</span>
           <div>
-            <strong>Historical assessment</strong>
+            <strong>Evaluación histórica</strong>
             <p>
               Esta evaluación pertenece a una versión anterior de la política y no contiene el
               desglose explicable.
@@ -230,12 +231,12 @@ export function AssessmentDetailPage() {
 
       <footer className={styles.trace}>
         <div>
-          <div className={styles.cardLabel}>TRACEABILITY</div>
-          <span>Correlation ID</span>
+          <div className={styles.cardLabel}>TRAZABILIDAD</div>
+          <span>ID de correlación</span>
           <code>{assessment.correlationId}</code>
         </div>
         <button className="button buttonSecondary" onClick={() => void copyCorrelation()}>
-          {copied ? 'Copied' : 'Copy ID'}
+          {copied ? 'Copiado' : 'Copiar ID'}
         </button>
       </footer>
     </div>

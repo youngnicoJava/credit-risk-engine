@@ -19,39 +19,39 @@ export function LoginPage() {
           <span>CR</span>
           <div>
             <strong>Credit Risk Engine</strong>
-            <small>Analyst console</small>
+            <small>Consola de análisis</small>
           </div>
         </div>
         <div className={styles.rule} />
-        <div className={styles.kicker}>RISK OPERATIONS</div>
-        <h1>{unauthorized ? 'Analyst access required' : 'Sign in to continue'}</h1>
+        <div className={styles.kicker}>OPERACIONES DE RIESGO</div>
+        <h1>{unauthorized ? 'Se requiere acceso de analista' : 'Iniciá sesión para continuar'}</h1>
         <p>
           {unauthorized
-            ? 'This account does not have RISK_ANALYST or ADMIN access.'
-            : 'Review explainable decisions, affordability evidence and policy outcomes.'}
+            ? 'Esta cuenta no tiene el rol RISK_ANALYST ni ADMIN.'
+            : 'Consultá decisiones explicables, indicadores de capacidad de pago y resultados de la política.'}
         </p>
         {unauthorized ? (
           <button className="button buttonSecondary" onClick={() => void keycloak.logout()}>
-            Sign out
+            Cerrar sesión
           </button>
         ) : (
           <button
             className="button"
             onClick={() => void keycloak.login({ redirectUri: `${window.location.origin}${from}` })}
           >
-            Continue with secure sign-in <span aria-hidden="true">→</span>
+            Continuar con inicio de sesión seguro <span aria-hidden="true">→</span>
           </button>
         )}
         <div className={styles.footer}>
-          Authorized roles <span>RISK_ANALYST</span>
+          Roles autorizados <span>RISK_ANALYST</span>
           <span>ADMIN</span>
         </div>
       </div>
       <div className={styles.side}>
-        <div className={styles.sideLabel}>DECISION INTELLIGENCE</div>
-        <div className={styles.sideTitle}>Understand the reasoning behind every risk outcome.</div>
+        <div className={styles.sideLabel}>ANÁLISIS DE DECISIONES</div>
+        <div className={styles.sideTitle}>Entendé los fundamentos de cada resultado de riesgo.</div>
         <div className={styles.sideMeta}>
-          Eligibility <i /> Affordability <i /> Explainable score
+          Elegibilidad <i /> Capacidad de pago <i /> Puntaje explicable
         </div>
       </div>
     </main>

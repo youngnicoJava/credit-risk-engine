@@ -10,14 +10,14 @@ export function ScoreDisplay({ score }: { score: number }) {
       </div>
       <div
         className={styles.track}
-        aria-label={`Internal credit score ${score} on a 300 to 850 scale`}
+        aria-label={`Puntaje interno ${score} en una escala de 300 a 850`}
       >
         <div className={styles.fill} style={{ width: `${position}%` }} />
         <span className={styles.marker} style={{ left: `${position}%` }} />
       </div>
       <div className={styles.scale}>
         <span>300</span>
-        <span>Internal demonstration score</span>
+        <span>Puntaje interno de demostración</span>
         <span>850</span>
       </div>
     </div>

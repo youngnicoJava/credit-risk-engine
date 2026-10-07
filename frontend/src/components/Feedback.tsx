@@ -1,7 +1,7 @@
 import { ApiError } from '../api/client'
 import styles from './Feedback.module.css'
 
-export function LoadingState({ label = 'Loading assessments…' }: { label?: string }) {
+export function LoadingState({ label = 'Cargando evaluaciones…' }: { label?: string }) {
   return (
     <div className={styles.state} role="status">
       <span className={styles.spinner} />
@@ -25,18 +25,18 @@ export function ErrorPanel({ error, onRetry }: { error: unknown; onRetry?: () =>
   return (
     <section className={styles.error} role="alert">
       <div>
-        <strong>{apiError?.status === 401 ? 'Session expired' : 'Could not load this data'}</strong>
+        <strong>{apiError?.status === 401 ? 'La sesión venció' : 'No se pudieron cargar los datos'}</strong>
         <p>
-          {apiError?.message ?? 'An unexpected error occurred while contacting the risk service.'}
+          {apiError?.message ?? 'Ocurrió un error inesperado al comunicarse con el servicio de riesgo.'}
         </p>
         {apiError?.code && <code>{apiError.code}</code>}
         {apiError?.correlationId && (
-          <p className={styles.correlation}>Correlation ID: {apiError.correlationId}</p>
+          <p className={styles.correlation}>ID de correlación: {apiError.correlationId}</p>
         )}
       </div>
       {onRetry && (
         <button className="button buttonSecondary" onClick={onRetry}>
-          Try again
+          Reintentar
         </button>
       )}
     </section>

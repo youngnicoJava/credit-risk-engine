@@ -8,14 +8,14 @@ import { EmptyState, ErrorPanel, LoadingState } from '../../components/Feedback'
 import styles from './AssessmentListPage.module.css'
 
 const decisions: Array<{ value: Decision | ''; label: string }> = [
-  { value: '', label: 'All decisions' },
-  { value: 'APPROVE', label: 'Approve' },
-  { value: 'REFER', label: 'Refer' },
-  { value: 'REJECT', label: 'Reject' },
+  { value: '', label: 'Todas las decisiones' },
+  { value: 'APPROVE', label: 'Aprobar' },
+  { value: 'REFER', label: 'Revisión manual' },
+  { value: 'REJECT', label: 'Rechazar' },
 ]
 const bands: Array<{ value: Exclude<RiskBand, 'UNKNOWN'> | ''; label: string }> = [
-  { value: '', label: 'All bands' },
-  ...(['A', 'B', 'C', 'D', 'E'] as const).map((value) => ({ value, label: `Band ${value}` })),
+  { value: '', label: 'Todas las bandas' },
+  ...(['A', 'B', 'C', 'D', 'E'] as const).map((value) => ({ value, label: 'Banda ' + value })),
 ]
 
 export function AssessmentListPage() {
@@ -55,12 +55,12 @@ export function AssessmentListPage() {
     <div className={styles.page}>
       <div className={styles.heading}>
         <div>
-          <div className={styles.eyebrow}>RISK OPERATIONS / DECISION HISTORY</div>
-          <h1>Risk assessments</h1>
-          <p>Review policy outcomes and open an assessment to inspect its decision evidence.</p>
+          <div className={styles.eyebrow}>OPERACIONES DE RIESGO / HISTORIAL DE DECISIONES</div>
+          <h1>Evaluaciones de riesgo</h1>
+          <p>Revisá los resultados de la política y abrí una evaluación para consultar sus fundamentos.</p>
         </div>
         <div className={styles.policy}>
-          <span className={styles.policyDot} /> Policy <b>personal-loan-ar</b>
+          <span className={styles.policyDot} /> Política <b>personal-loan-ar</b>
           <i>2.0.0</i>
         </div>
       </div>
@@ -68,7 +68,7 @@ export function AssessmentListPage() {
       <div className={styles.toolbar}>
         <div className={styles.filters}>
           <label>
-            Decision
+            Decisión
             <select
               value={decision}
               onChange={(event) => changeFilter('decision', event.target.value)}
@@ -81,7 +81,7 @@ export function AssessmentListPage() {
             </select>
           </label>
           <label>
-            Risk band
+            Banda de riesgo
             <select
               value={riskBand}
               onChange={(event) => changeFilter('riskBand', event.target.value)}
@@ -94,7 +94,7 @@ export function AssessmentListPage() {
             </select>
           </label>
         </div>
-        <span className={styles.count}>{data?.totalElements ?? '—'} assessments</span>
+        <span className={styles.count}>{data?.totalElements ?? '—'} evaluaciones</span>
       </div>
 
       {loading && <LoadingState label="Loading decision history…" />}
@@ -105,9 +105,8 @@ export function AssessmentListPage() {
         />
       )}
       {!loading && !error && data?.items.length === 0 && (
-        <EmptyState title="No assessments found">
-          Try changing the decision or risk band filters. New assessments will appear here after
-          evaluation.
+        <EmptyState title="No se encontraron evaluaciones">
+          Probá con otros filtros de decisión o banda de riesgo. Las nuevas evaluaciones aparecerán aquí después de procesarse.
         </EmptyState>
       )}
       {!loading && !error && data && data.items.length > 0 && (
@@ -116,13 +115,13 @@ export function AssessmentListPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Evaluated</th>
-                  <th>Loan application</th>
-                  <th>Decision</th>
+                  <th>Fecha de evaluación</th>
+                  <th>Solicitud</th>
+                  <th>Decisión</th>
                   <th>Score</th>
-                  <th>Risk band</th>
-                  <th>Policy</th>
-                  <th aria-label="Open" />
+                  <th>Banda de riesgo</th>
+                  <th>Política</th>
+                  <th aria-label="Abrir" />
                 </tr>
               </thead>
               <tbody>
@@ -149,9 +148,9 @@ export function AssessmentListPage() {
                       <Link
                         className={styles.open}
                         to={`/assessments/${item.assessmentId}`}
-                        aria-label={`Open assessment ${item.assessmentId}`}
+                        aria-label={`Abrir evaluación ${item.assessmentId}`}
                       >
-                        Open <span aria-hidden="true">↗</span>
+                        Abrir <span aria-hidden="true">↗</span>
                       </Link>
                     </td>
                   </tr>
@@ -161,7 +160,7 @@ export function AssessmentListPage() {
           </div>
           <nav className={styles.pagination} aria-label="Assessment pages">
             <span>
-              Page {data.page + 1} of {Math.max(data.totalPages, 1)}
+              Página {data.page + 1} de {Math.max(data.totalPages, 1)}
             </span>
             <div>
               <button
@@ -174,7 +173,7 @@ export function AssessmentListPage() {
                   })
                 }
               >
-                Previous
+                Anterior
               </button>
               <button
                 className="button buttonSecondary"
@@ -186,7 +185,7 @@ export function AssessmentListPage() {
                   })
                 }
               >
-                Next
+                Siguiente
               </button>
             </div>
           </nav>
@@ -194,7 +193,7 @@ export function AssessmentListPage() {
       )}
       {error instanceof ApiError && error.status === 401 && (
         <div className={styles.session}>
-          Your session may have expired. Sign out and authenticate again.
+          La sesión puede haber vencido. Cerrá sesión e iniciá sesión nuevamente.
         </div>
       )}
     </div>
@@ -205,7 +204,7 @@ function shortId(id: string) {
   return `${id.slice(0, 8)}…${id.slice(-4)}`
 }
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(
+  return new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium', timeStyle: 'short' }).format(
     new Date(value),
   )
 }

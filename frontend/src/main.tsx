@@ -23,7 +23,7 @@ function Root() {
       .catch(setError)
   }, [])
   if (error) return <StartupError error={error} />
-  if (!ready) return <LoadingState label="Connecting to identity provider…" />
+  if (!ready) return <LoadingState label="Conectando con el proveedor de identidad…" />
   return (
     <BrowserRouter>
       <App />
