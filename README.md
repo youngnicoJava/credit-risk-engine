@@ -2,6 +2,42 @@
 
 Servicio independiente que evalúa elegibilidad, asequibilidad y riesgo de una solicitud personal usando información declarada. Produce APPROVE, REFER o REJECT con explicación persistida; no origina ofertas ni reemplaza un bureau/FICO.
 
+## Recorrido visual y lectura técnica
+
+**Java 25 · Quarkus 3.39.5 · PostgreSQL · Flyway · Kafka/outbox · OIDC/Keycloak · React · TypeScript**
+
+![Consola real de evaluaciones crediticias](docs/assets/screenshots/assessments.jpg)
+
+La dificultad central es producir una decisión reproducible y explicable, sin confundir score, asequibilidad y aprobación. La política se ejecuta en el dominio; React muestra el snapshot persistido y el analista puede explorar su fundamento. Loan Origination conserva la autoridad sobre ofertas y préstamos.
+
+### APPROVE con explicación
+
+![Evaluación APPROVE con score, banda y capacidad de pago](docs/assets/screenshots/assessment-approve.jpg)
+
+![Desglose de aportes y motivos de la política](docs/assets/screenshots/assessment-explanation.jpg)
+
+La cuota de referencia usa una tasa de estrés de 48% TNA. No es la cuota contractual de Loan Origination. El ejemplo tiene score 850/A y DTI proyectado 4,37%, con motivos y aportes persistidos.
+
+### Un score alto no elimina los gates
+
+![Evaluación REFER pese a una banda A](docs/assets/screenshots/assessment-refer.jpg)
+
+El fixture REFER obtiene 785/A, pero requiere revisión por su perfil laboral. La política devuelve una decisión de negocio; no toda respuesta negativa debe convertirse en error HTTP.
+
+**9 capturas reales**: autenticación, historial, APPROVE/REFER/REJECT, explicación y Swagger. [Ver la galería completa](docs/visual-tour.md).
+
+## Documentación para explorar el proyecto
+
+| Documento | Contenido |
+|---|---|
+| [Índice técnico](docs/README.md) | Recorrido sugerido y documentos existentes |
+| [Galería real](docs/visual-tour.md) | 9 capturas, roles, rutas y contexto de cada pantalla |
+| [Backend paso a paso](docs/backend-walkthrough.md) | Reglas, transacciones, identidad e invariantes |
+| [Flujo entre los tres servicios](docs/ecosystem-flow.md) | Contratos Kafka, gates, outbox y modos LOCAL/KAFKA |
+| [Evidencia de esta campaña](docs/evidence-2026-10-10.md) | Entorno, tests, builds y límites de lo verificado |
+
+Las capturas son del frontend real conectado a los backends y PostgreSQL de desarrollo, tomadas el **10/10/2026** con datos de prueba existentes. No son mockups ni pantallas fabricadas. La sesión consultó fixtures históricos; no ejecutó nuevas operaciones financieras ni un E2E Kafka. Ver detalles y estado de builds en la evidencia.
+
 ## Ecosistema
 
 Loan Origination posee solicitud y workflow. Credit Risk pregunta si el perfil declarado satisface una política. Fraud Detection evalúa comportamiento sospechoso. Los bounded contexts mantienen reglas y bases separadas.
@@ -21,7 +57,7 @@ flowchart LR
 
 Clean Architecture: domain sin framework, application y ports, adapters REST/Kafka/persistencia; Quarkus conecta infraestructura. Flyway gestiona schema; Hibernate valida.
 
-Policy personal-loan-ar 2.0.0. Entrada: PERSONAL_LOAN, capital, ARS, plazo, ingreso/deuda mensual declarados, empleo/antigüedad. No incluye nombre, email, subject OIDC ni bureau. Elegibilidad: ARS 100.000–10.000.000, plazo 6–60 meses, ingreso ≥ ARS 100.000. Invalid request produce error.
+Policy personal-loan-ar 2.0.0. Entrada: PERSONAL_LOAN, capital, ARS, plazo, ingreso/deuda mensual declarados, empleo/antigüedad. No incluye nombre, email, subject OIDC ni bureau. Elegibilidad: ARS 100.000–10.000.000, plazo 6–60 meses, ingreso ≥ ARS 100.000. Una petición estructuralmente inválida produce error; una entrada válida fuera de los límites de elegibilidad puede producir REJECT con motivos.
 
 Cuota referencial usa sistema francés y tasa nominal anual de estrés 48% (mensual 48/1200); no es oferta de LO. DTI actual=deuda/ingreso; proyectado=(deuda+cuota)/ingreso; disponible=ingreso−deuda−cuota. BigDecimal, dinero 2 decimales, DTI 4. DTI proyectado >60% o disponible ≤0 fuerza REJECT.
 
@@ -67,12 +103,12 @@ El canal activo es v2; contratos v1 en docs son históricos. assessmentRequestId
 | ---: | ---------: | -------: | ---: | ----: |
 | 8082 |       5434 |     8181 | 5174 | 29092 |
 
-Vite 5174 evita colisión con LO 5173; Keycloak permite ese redirect/origin. El default CORS del backend coincide con el origen local http://localhost:5174; FRONTEND_ORIGIN permite configurarlo para otros entornos. Requisitos: JDK25, Docker, Bun.
+En el working tree usado para las capturas, application.properties fija 8081; la consola apunta a 8082. El comando siguiente hace explícito el override de desarrollo para alinearlos, sin alterar la configuración existente. Vite 5174 evita colisión con LO 5173; Keycloak permite ese redirect/origin. El default CORS del backend coincide con el origen local http://localhost:5174; FRONTEND_ORIGIN permite configurarlo para otros entornos. Requisitos: JDK25, Docker, Bun.
 
 ```powershell
 docker compose up -d postgres
 $env:DB_JDBC_URL='jdbc:postgresql://localhost:5434/credit_risk'
-.\mvnw.cmd quarkus:dev
+.\mvnw.cmd quarkus:dev -Dquarkus.http.port=8082
 ```
 
 Otra terminal: cd frontend; bun install --frozen-lockfile; bun run dev. Abrir http://localhost:5174. Variables SPA en frontend/.env.example (API8082, issuer8181, realm/client). Producción requiere DB_USERNAME, DB_PASSWORD, DB_JDBC_URL, OIDC_AUTH_SERVER_URL, FRONTEND_ORIGIN, PORT, KAFKA_BOOTSTRAP_SERVERS y OTEL variables; no Dev Services ni usuarios demo.

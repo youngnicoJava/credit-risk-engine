@@ -1,0 +1,99 @@
+{
+  "project": "Credit Risk Engine",
+  "environment": "REAL_LOCAL_DEVELOPMENT",
+  "data": "EXISTING_PUBLIC_DEMO_FIXTURES",
+  "campaignDate": "2026-10-10",
+  "integrationE2EExecuted": false,
+  "screenshots": [
+    {
+      "file": "assessments.jpg",
+      "title": "Consola del analista",
+      "role": "RISK_ANALYST",
+      "route": "/assessments",
+      "context": "23 evaluaciones existentes; paginación, decisión, banda y política permiten explorar el historial.",
+      "capturedAt": "2026-10-10T07:13:24.705Z",
+      "sha256": "9aed2688e13091ff1c06161484881a05baf4bfe7b844b5c88f966097db5fe81c",
+      "bytes": 109628
+    },
+    {
+      "file": "login.jpg",
+      "title": "Acceso a la consola",
+      "role": "PUBLIC",
+      "route": "/login",
+      "context": "Entrada real de la SPA.",
+      "capturedAt": "2026-10-10T07:12:30.407Z",
+      "sha256": "291a2eaa51925a2143ddd710242a9fef3b7f6c60481d70192e70c2d31b103924",
+      "bytes": 56054
+    },
+    {
+      "file": "keycloak.jpg",
+      "title": "Realm independiente",
+      "role": "PUBLIC",
+      "route": "/realms/credit-risk/protocol/openid-connect/auth",
+      "context": "Keycloak credit-risk: autentica al analista sin compartir el realm del cliente LO. Formulario vacío.",
+      "capturedAt": "2026-10-10T07:12:41.593Z",
+      "sha256": "23468a1bae1254af20d2cc81ebe91443e1db2ab0c8aa1358e4d28e9a6478e5c8",
+      "bytes": 43364
+    },
+    {
+      "file": "assessment-approve.jpg",
+      "title": "Capacidad suficiente: APPROVE",
+      "role": "RISK_ANALYST",
+      "route": "/assessments/cd8ebf0b-b876-4c9c-9494-1b5b6e6ad2d2",
+      "context": "Score 850, banda A y DTI proyectado 4,37%. Capital ARS 1.000.000, plazo 24 meses, ingreso ARS 1.500.000 y empleo permanente.",
+      "capturedAt": "2026-10-10T07:14:00.759Z",
+      "sha256": "de9667fc53566c038b1e8d37769a430a65b63b840e7314ecdb04d5b4ac4f267f",
+      "bytes": 77345
+    },
+    {
+      "file": "assessment-explanation.jpg",
+      "title": "Explicabilidad persistida",
+      "role": "RISK_ANALYST",
+      "route": "/assessments/cd8ebf0b-b876-4c9c-9494-1b5b6e6ad2d2",
+      "context": "Contribuciones, motivos, perfil evaluado y correlation ID. La explicación corresponde a la decisión guardada, no a un cálculo nuevo en React.",
+      "capturedAt": "2026-10-10T07:14:10.636Z",
+      "sha256": "40a1640e03430a4dac671c118b991d63ed473e15390f353cb75f4f5117e41d22",
+      "bytes": 79859
+    },
+    {
+      "file": "assessment-refer.jpg",
+      "title": "Buen score con revisión: REFER",
+      "role": "RISK_ANALYST",
+      "route": "/assessments/6501c80c-ffac-47dc-8318-04ad85a7da63",
+      "context": "Score 785 y banda A no bastan para aprobar: el fixture tiene empleo temporal con 2 meses de antigüedad. Ilustra que score y decisión son conceptos distintos.",
+      "capturedAt": "2026-10-10T07:35:34.259Z",
+      "sha256": "9fd41c7d546f746acb8b4a1ea9b2ffc9a26abcfc2e417eccb04f95de2e669c28",
+      "bytes": 78309
+    },
+    {
+      "file": "assessment-reject.jpg",
+      "title": "Perfil rechazado por la política",
+      "role": "RISK_ANALYST",
+      "route": "/assessments/addfee45-91a1-4bb8-9f93-469335c5f1d6",
+      "context": "Resultado REJECT, score 300 y banda E. Es evaluación crediticia demostrativa, no verificación de un bureau ni de identidad.",
+      "capturedAt": "2026-10-10T07:14:24.580Z",
+      "sha256": "33aab117f87eb3b73770395e7be87a0ef10520ea9f65de9e42cb8819a37dabc3",
+      "bytes": 77845
+    },
+    {
+      "file": "swagger.jpg",
+      "title": "API de evaluaciones",
+      "role": "PUBLIC",
+      "route": "/q/swagger-ui",
+      "context": "REST real para evaluar y consultar, con autorización RISK_ANALYST/ADMIN. No se ejecutó POST desde Swagger.",
+      "capturedAt": "2026-10-10T07:14:56.481Z",
+      "sha256": "fc1097e4edf3a57140a4971ff08dcc30a6c4a05844f21728233f98f426073519",
+      "bytes": 71351
+    },
+    {
+      "file": "api-contract.jpg",
+      "title": "Entrada estructurada de riesgo",
+      "role": "PUBLIC",
+      "route": "/q/swagger-ui",
+      "context": "Schema generado del endpoint de evaluación. La validez del DTO y la elegibilidad de la política son validaciones diferentes.",
+      "capturedAt": "2026-10-10T07:15:17.171Z",
+      "sha256": "f5a73a9a67a5a5f8f9bada3c0ea953b1d378b0cc78be7e11e514f71381f37076",
+      "bytes": 85033
+    }
+  ]
+}
